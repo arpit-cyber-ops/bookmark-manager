@@ -1,7 +1,44 @@
-import bookmarks from "./data/bookmark"
+"use client"
+import initialBookmark from "./data/bookmark"
 import BookmarkCard from "./components/BookmarkCard";
+import { useState } from "react";
+
+interface form {
+  title: string,
+  url: string,
+  description: string,
+  category: string
+}
 
 export default function App() {
+  const [showForm, setShowForm] = useState<boolean>(false);
+  const [formData, setFormData] = useState<form>({
+    title: "",
+    url: "",
+    description: "",
+    category: ""
+  });
+  const [bookmarks, setBookmarks] = useState(initialBookmark);
+  function deleteCard(deleteId: number) {
+    setBookmarks(bookmarks.filter((bookmark) => bookmark.id !== deleteId))
+  }
+  function handleSave() {
+    setBookmarks([...bookmarks, {
+      id: bookmarks.length + 1,
+      title: formData.title,
+      url: formData.url,
+      tags: [formData.category],
+      description: formData.description,
+      createdAt: ""
+    }]);
+    setFormData({
+      title: "",
+      url: "",
+      description: "",
+      category: "",
+    });
+    setShowForm(false);
+  }
   return (
     <div className="flex w-full h-screen border" >
       <div className="flex flex-col gap-4 p-4 w-75">
@@ -12,8 +49,60 @@ export default function App() {
       <main className="flex flex-col flex-1 border ">
         <div className="p-4 flex justify-between border">
           <input type="text" placeholder="  Search by title..." className="border rounded-sm" />
-          <button className="bg-green-900 text-white w-35 h-8 rounded-sm">+ Add Bookmark</button>
+          <button className="bg-green-900 text-white w-35 h-8 rounded-sm cursor-pointer" onClick={() => setShowForm(!showForm)}>+ Add Bookmark</button>
         </div>
+        {showForm && (
+          <div className="m-2 flex gap-2">
+            <label htmlFor="title">Title: </label>
+            <input
+              className="border"
+              id="title"
+              type="text"
+              value={formData.title}
+              onChange={(e) => setFormData({
+                ...formData,
+                title: e.target.value
+              })} />
+
+            <label htmlFor="url">URL: </label>
+            <input
+              className="border"
+              type="text"
+              id="url"
+              value={formData.url}
+              onChange={(e) => setFormData({
+                ...formData,
+                url: e.target.value
+              })} />
+
+            <label htmlFor="description">Description: </label>
+            <input
+              className="border"
+              id="description"
+              type="text"
+              value={formData.description}
+              onChange={(e) => setFormData({
+                ...formData,
+                description: e.target.value
+              })} />
+
+            <label htmlFor="category">Category: </label>
+            <input
+              className="border"
+              id="category"
+              type="text"
+              value={formData.category}
+              onChange={(e) => setFormData({
+                ...formData,
+                category: e.target.value
+              })} />
+
+            <button className="border rounded-2xl p-0.5 cursor-pointer"
+              onClick={handleSave}>
+              Save
+            </button>
+          </div>
+        )}
         <div className=" bg-sky-50">
           <h2 className="text-2xl font-bold m-4">All Bookmarks</h2>
           <div className="grid grid-cols-3 border gap-4 p-4">
@@ -21,6 +110,7 @@ export default function App() {
               <BookmarkCard
                 key={bookmark.id}
                 bookmark={bookmark}
+                onDelete={deleteCard}
               />
             ))}
           </div>
