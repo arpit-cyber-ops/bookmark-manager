@@ -23,10 +23,17 @@ export default function App() {
     setBookmarks(bookmarks.filter((bookmark) => bookmark.id !== deleteId))
   }
   function handleSave() {
+    if (!formData.title.trim() || !formData.url.trim()) {
+      return;
+    }
+    let formattedUrl = formData.url;
+    if (!formData.url.startsWith('http://') && !formData.url.startsWith('https://')) {
+      formattedUrl = 'https://' + formData.url;
+    }
     setBookmarks([...bookmarks, {
       id: bookmarks.length + 1,
       title: formData.title,
-      url: formData.url,
+      url: formattedUrl,
       tags: [formData.category],
       description: formData.description,
       createdAt: ""
@@ -47,55 +54,64 @@ export default function App() {
         <h3>Archeived</h3>
       </div>
       <main className="flex flex-col flex-1 border ">
-        <div className="p-4 flex justify-between border">
+        <div className="p-4 flex justify-between">
           <input type="text" placeholder="  Search by title..." className="border rounded-sm" />
           <button className="bg-green-900 text-white w-35 h-8 rounded-sm cursor-pointer" onClick={() => setShowForm(!showForm)}>+ Add Bookmark</button>
         </div>
         {showForm && (
-          <div className="m-2 flex gap-2">
-            <label htmlFor="title">Title: </label>
-            <input
-              className="border"
-              id="title"
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData({
-                ...formData,
-                title: e.target.value
-              })} />
+          <div className="m-2 flex flex-col justify-center items-center border gap-4 p-4">
 
-            <label htmlFor="url">URL: </label>
-            <input
-              className="border"
-              type="text"
-              id="url"
-              value={formData.url}
-              onChange={(e) => setFormData({
-                ...formData,
-                url: e.target.value
-              })} />
+            <div>
+              <label htmlFor="title">Title: </label>
+              <input
+                className="border"
+                id="title"
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  title: e.target.value
+                })} />
+            </div>
 
-            <label htmlFor="description">Description: </label>
-            <input
-              className="border"
-              id="description"
-              type="text"
-              value={formData.description}
-              onChange={(e) => setFormData({
-                ...formData,
-                description: e.target.value
-              })} />
+            <div>
+              <label htmlFor="url">URL: </label>
+              <input
+                className="border"
+                type="text"
+                id="url"
+                value={formData.url}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  url: e.target.value
+                })} />
+            </div>
 
-            <label htmlFor="category">Category: </label>
-            <input
-              className="border"
-              id="category"
-              type="text"
-              value={formData.category}
-              onChange={(e) => setFormData({
-                ...formData,
-                category: e.target.value
-              })} />
+            <div>
+              <label htmlFor="description">Description: </label>
+              <input
+                className="border"
+                id="description"
+                type="text"
+                value={formData.description}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  description: e.target.value
+                })} />
+            </div>
+
+            <div>
+              <label htmlFor="category">Category: </label>
+              <input
+                className="border"
+                id="category"
+                type="text"
+                value={formData.category}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  category: e.target.value
+                })} />
+            </div>
 
             <button className="border rounded-2xl p-0.5 cursor-pointer"
               onClick={handleSave}>
@@ -105,7 +121,7 @@ export default function App() {
         )}
         <div className=" bg-sky-50">
           <h2 className="text-2xl font-bold m-4">All Bookmarks</h2>
-          <div className="grid grid-cols-3 border gap-4 p-4">
+          <div className="grid grid-cols-3 gap-4 p-4">
             {bookmarks.map((bookmark) => (
               <BookmarkCard
                 key={bookmark.id}
