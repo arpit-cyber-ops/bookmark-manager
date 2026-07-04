@@ -2,6 +2,9 @@
 import initialBookmark from "./data/bookmark"
 import BookmarkCard from "./components/BookmarkCard";
 import { useState } from "react";
+import type { Bookmark } from "./type/bookmark";
+import SideBar from "./components/SideBar";
+
 
 interface form {
   title: string,
@@ -11,17 +14,30 @@ interface form {
 }
 
 export default function App() {
+
   const [showForm, setShowForm] = useState<boolean>(false);
+
   const [formData, setFormData] = useState<form>({
     title: "",
     url: "",
     description: "",
     category: ""
   });
+
   const [bookmarks, setBookmarks] = useState(initialBookmark);
+
   function deleteCard(deleteId: number) {
     setBookmarks(bookmarks.filter((bookmark) => bookmark.id !== deleteId))
   }
+
+  // Search Bar 
+
+  const [searchTerm, setSearchterm] = useState<string>("");
+
+  const filteredBookmarks: Bookmark[] = bookmarks.filter((bookmark) => bookmark.title.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  // Save Button
+
   function handleSave() {
     if (!formData.title.trim() || !formData.url.trim()) {
       return;
@@ -46,18 +62,53 @@ export default function App() {
     });
     setShowForm(false);
   }
+
+  // Side Bar - category Search
+
+  const [selectedCategory, setSelectedCategory] = useState<string[]>(["All"]);
+
+  const categoryFilter: Bookmark[] = [];
+  for (const bookmark of bookmarks) {
+    for (const tag of bookmark.tags) {
+      if (selectedCategory.includes(tag)) {
+        categoryFilter.push(bookmark);
+      }
+    }
+  }
+
+  function handleClick(e: React.ChangeEvent<HTMLInputElement>, item: string) {
+    if (e.target.checked) {
+      setSelectedCategory(prev => [...prev, item]);
+    }
+    else {
+      setSelectedCategory(prev => prev.filter(i => i !== item))
+    }
+  };
+
   return (
     <div className="flex w-full h-screen border" >
+
+      {/* Side Bar and Main Heading */}
+
       <div className="flex flex-col gap-4 p-4 w-75">
         <h1 className="text-xl font-bold mb-4">Bookmark Manager</h1>
         <h3>Home</h3>
         <h3>Archeived</h3>
+        <div>
+          <SideBar bookmarks={bookmarks} onClick={handleClick} />
+        </div>
       </div>
       <main className="flex flex-col flex-1 border ">
+
+      {/* Add Bookmark Button and Search Bar */}
+
         <div className="p-4 flex justify-between">
-          <input type="text" placeholder="  Search by title..." className="border rounded-sm" />
+          <input type="text" placeholder="  Search by title..." className="border rounded-sm" onChange={(e) => setSearchterm(e.target.value)} />
           <button className="bg-green-900 text-white w-35 h-8 rounded-sm cursor-pointer" onClick={() => setShowForm(!showForm)}>+ Add Bookmark</button>
         </div>
+
+      {/* Form Structure */}
+
         {showForm && (
           <div className="m-2 flex flex-col justify-center items-center border gap-4 p-4">
 
@@ -113,25 +164,42 @@ export default function App() {
                 })} />
             </div>
 
+          {/* Save Button */}
+
             <button className="border rounded-2xl p-0.5 cursor-pointer"
               onClick={handleSave}>
               Save
             </button>
           </div>
         )}
+
+        {/* Card Structure */}
+
         <div className=" bg-sky-50">
           <h2 className="text-2xl font-bold m-4">All Bookmarks</h2>
           <div className="grid grid-cols-3 gap-4 p-4">
-            {bookmarks.map((bookmark) => (
-              <BookmarkCard
-                key={bookmark.id}
-                bookmark={bookmark}
-                onDelete={deleteCard}
-              />
-            ))}
+            {selectedCategory.includes("All") ? (
+                filteredBookmarks.map((bookmark) => (
+                  <BookmarkCard
+                    key={bookmark.id}
+                    bookmark={bookmark}
+                    onDelete={deleteCard}
+                  />
+                ))
+            ) : (
+              categoryFilter.map((bookmark) => (
+                <BookmarkCard
+                    key={bookmark.id}
+                    bookmark={bookmark}
+                    onDelete={deleteCard}
+                  />
+              ))
+            )
+            }
           </div>
         </div>
       </main>
+
     </div>
   )
 }
