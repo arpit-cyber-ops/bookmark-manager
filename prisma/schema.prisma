@@ -14,5 +14,5 @@ model Bookmark {
   category            String
   description         String        
   createdAt           DateTime              @default(now())
-  isArchieved         Boolean               @default(false)
+  isArchived         Boolean               @default(false)
 }
