@@ -94,6 +94,8 @@ export default function App() {
         <h1 className="text-xl font-bold mb-4">Bookmark Manager</h1>
         <h3>Home</h3>
         <h3>Archeived</h3>
+        <hr />
+        <p className="font-light">Tags</p>
         <div>
           <SideBar bookmarks={bookmarks} onClick={handleClick} />
         </div>

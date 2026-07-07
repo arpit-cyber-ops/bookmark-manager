@@ -15,22 +15,31 @@ export default function SideBar({ bookmarks, onClick }: sideBarProps) {
         }
     }
     return (
-        <div>
-            <input 
-                type="checkbox" 
-                id="All"
-                onChange={(e) => onClick(e, "All")}
-                defaultChecked
-            />
-            <label htmlFor="All">ALL</label>
+        <div className=" flex flex-col gap-2">
+            <div className="
+            flex gap-2
+            hover:bg-sky-50
+            hover:scale-105
+            transition-transform
+            ">
+                <input
+                    type="checkbox"
+                    id="All"
+                    onChange={(e) => onClick(e, "All")}
+                    defaultChecked
+                    className="cursor-pointer"
+                />
+                <label htmlFor="All" className="cursor-pointer flex-1">ALL</label>
+            </div>
             {tagArray.map((tag) => (
-                <div key={tag}>
-                    <input 
+                <div key={tag} className="flex gap-2 hover:scale-105 transition-transform hover:bg-sky-50">
+                    <input
                         type="checkbox"
                         id={tag}
                         onChange={(e) => onClick(e, tag)}
-                        />
-                    <label htmlFor={tag}>{tag}</label>
+                        className="cursor-pointer"
+                    />
+                    <label htmlFor={tag} className="cursor-pointer flex-1">{tag}</label>
                 </div>
             ))}
         </div>
