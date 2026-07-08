@@ -28,3 +28,14 @@ export async function POST(request: Request){
 
     return Response.json(bookmark);
 }
+
+export async function DELETE(request: Request){
+    const body = await request.json();
+    const bookmark = await prisma.bookmark.delete({
+        where: {
+            id: body.id,
+        },
+    });
+    
+    return Response.json(bookmark);
+}

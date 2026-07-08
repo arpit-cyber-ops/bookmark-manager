@@ -5,4 +5,5 @@ export interface Bookmark {
   description: string;
   tags: string[];
   createdAt: string;
+  isArchived: boolean;
 }

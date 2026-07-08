@@ -1,9 +1,9 @@
 "use client"
-import initialBookmark from "./data/bookmark"
 import BookmarkCard from "./components/BookmarkCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Bookmark } from "./type/bookmark";
 import SideBar from "./components/SideBar";
+import { POST } from "./api/bookmarks/route";
 
 
 interface form {
@@ -24,10 +24,42 @@ export default function App() {
     category: ""
   });
 
-  const [bookmarks, setBookmarks] = useState(initialBookmark);
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
 
-  function deleteCard(deleteId: number) {
-    setBookmarks(bookmarks.filter((bookmark) => bookmark.id !== deleteId))
+  useEffect(() => {
+    async function fetchBookmarks(){
+
+      const response = await fetch("/api/bookmarks");
+      const data = await response.json();
+
+      const formattedBookmarks = data.map((bookmark:any) => ({
+        id: bookmark.id,
+        title: bookmark.title,
+        url: bookmark.url,
+        tags: [bookmark.category],
+        description: bookmark.description,
+        createdAt: bookmark.createdAt,
+        isArchived: bookmark.isArchived,
+      }))
+
+      setBookmarks(formattedBookmarks);
+    }
+
+    fetchBookmarks();
+  }, []);
+
+  async function deleteCard(deleteId: number) {
+    const response = await fetch("/api/bookmarks", {
+      method: "DELETE",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        id: deleteId,
+      }),
+    });
+    const data = await response.json();
+    setBookmarks(prev => prev.filter((bookmark) => bookmark.id !== deleteId))
   }
 
   // Search Bar 
@@ -38,22 +70,44 @@ export default function App() {
 
   // Save Button
 
-  function handleSave() {
+  async function handleSave() {
     if (!formData.title.trim() || !formData.url.trim()) {
       return;
     }
     let formattedUrl = formData.url;
-    if (!formData.url.startsWith('http://') && !formData.url.startsWith('https://')) {
+    if (
+      !formData.url.startsWith('http://') && 
+      !formData.url.startsWith('https://')
+    ) {
       formattedUrl = 'https://' + formData.url;
     }
-    setBookmarks([...bookmarks, {
-      id: bookmarks.length + 1,
-      title: formData.title,
+
+    const bookmarkToSave = {
+      ...formData,
       url: formattedUrl,
-      tags: [formData.category],
-      description: formData.description,
-      createdAt: ""
-    }]);
+    };
+
+    const response = await fetch("/api/bookmarks", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(bookmarkToSave),
+    });
+
+    const data = await response.json();
+
+    const newBookmark: Bookmark = {
+      id: data.id,
+      title: data.title,
+      url: data.url,
+      tags: [data.category],
+      description: data.description,
+      createdAt: data.createdAt,
+      isArchived: data.isArchived,
+    };
+
+    setBookmarks(prev => [...prev, newBookmark]);
     setFormData({
       title: "",
       url: "",
@@ -106,7 +160,7 @@ export default function App() {
 
         <div className="p-4 flex justify-between">
           <input type="text" placeholder="  Search by title..." className="border rounded-sm hover:scale-105 px-2 transition-transform" onChange={(e) => setSearchterm(e.target.value)} />
-          <button className="bg-green-900 text-white w-35 h-8 rounded-sm cursor-pointer" onClick={() => setShowForm(!showForm)}>+ Add Bookmark</button>
+          <button className="bg-green-900 text-white w-35 h-8 rounded-md cursor-pointer hover:scale-110 transition-transform" onClick={() => setShowForm(!showForm)}>+ Add Bookmark</button>
         </div>
 
       {/* Form Structure */}
