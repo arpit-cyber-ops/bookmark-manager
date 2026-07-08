@@ -105,7 +105,7 @@ export default function App() {
       {/* Add Bookmark Button and Search Bar */}
 
         <div className="p-4 flex justify-between">
-          <input type="text" placeholder="  Search by title..." className="border rounded-sm" onChange={(e) => setSearchterm(e.target.value)} />
+          <input type="text" placeholder="  Search by title..." className="border rounded-sm hover:scale-105 px-2 transition-transform" onChange={(e) => setSearchterm(e.target.value)} />
           <button className="bg-green-900 text-white w-35 h-8 rounded-sm cursor-pointer" onClick={() => setShowForm(!showForm)}>+ Add Bookmark</button>
         </div>
 
@@ -117,7 +117,7 @@ export default function App() {
             <div>
               <label htmlFor="title">Title: </label>
               <input
-                className="border"
+                className="border px-1 rounded-md"
                 id="title"
                 type="text"
                 value={formData.title}
@@ -130,7 +130,7 @@ export default function App() {
             <div>
               <label htmlFor="url">URL: </label>
               <input
-                className="border"
+                className="border px-1 rounded-md"
                 type="text"
                 id="url"
                 value={formData.url}
@@ -143,7 +143,7 @@ export default function App() {
             <div>
               <label htmlFor="description">Description: </label>
               <input
-                className="border"
+                className="border px-1 rounded-md"
                 id="description"
                 type="text"
                 value={formData.description}
@@ -156,7 +156,7 @@ export default function App() {
             <div>
               <label htmlFor="category">Category: </label>
               <input
-                className="border"
+                className="border px-1 rounded-md"
                 id="category"
                 type="text"
                 value={formData.category}
@@ -168,7 +168,7 @@ export default function App() {
 
           {/* Save Button */}
 
-            <button className="border rounded-2xl p-0.5 cursor-pointer"
+            <button className="border rounded-2xl p-1.5 cursor-pointer hover:scale-110 transition-transform hover:bg-sky-100"
               onClick={handleSave}>
               Save
             </button>
