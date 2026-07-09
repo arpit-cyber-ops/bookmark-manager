@@ -3,8 +3,6 @@ import BookmarkCard from "./components/BookmarkCard";
 import { useState, useEffect } from "react";
 import type { Bookmark } from "./type/bookmark";
 import SideBar from "./components/SideBar";
-import { POST } from "./api/bookmarks/route";
-
 
 interface form {
   title: string,
@@ -24,42 +22,76 @@ export default function App() {
     category: ""
   });
 
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
+
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    async function fetchBookmarks(){
+    async function fetchBookmarks() {
 
-      const response = await fetch("/api/bookmarks");
-      const data = await response.json();
+      setError("");
 
-      const formattedBookmarks = data.map((bookmark:any) => ({
-        id: bookmark.id,
-        title: bookmark.title,
-        url: bookmark.url,
-        tags: [bookmark.category],
-        description: bookmark.description,
-        createdAt: bookmark.createdAt,
-        isArchived: bookmark.isArchived,
-      }))
+      try {
 
-      setBookmarks(formattedBookmarks);
+        const response = await fetch("/api/bookmarks");
+        const data = await response.json();
+
+        const formattedBookmarks = data.map((bookmark: any) => ({
+          id: bookmark.id,
+          title: bookmark.title,
+          url: bookmark.url,
+          tags: [bookmark.category],
+          description: bookmark.description,
+          createdAt: bookmark.createdAt,
+          isArchived: bookmark.isArchived,
+        }))
+
+        setBookmarks(formattedBookmarks);
+      }
+
+      catch (error) {
+        console.log(error);
+        setError("Error: Failed to load Bookmarks...");
+      }
+
+      finally {
+        setLoading(false);
+      }
     }
 
     fetchBookmarks();
   }, []);
 
   async function deleteCard(deleteId: number) {
-    const response = await fetch("/api/bookmarks", {
-      method: "DELETE",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify({
-        id: deleteId,
-      }),
-    });
-    const data = await response.json();
-    setBookmarks(prev => prev.filter((bookmark) => bookmark.id !== deleteId))
+    setError("");
+    setDeleting(true);
+    try {
+
+      const response = await fetch("/api/bookmarks", {
+        method: "DELETE",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          id: deleteId,
+        }),
+      });
+      
+      setBookmarks(prev => prev.filter((bookmark) => bookmark.id !== deleteId))
+    }
+
+    catch(error){
+      console.log(error);
+      setError("Error: Failed to delete card....");
+    }
+
+    finally{
+      setDeleting(false);
+    }
   }
 
   // Search Bar 
@@ -71,12 +103,18 @@ export default function App() {
   // Save Button
 
   async function handleSave() {
-    if (!formData.title.trim() || !formData.url.trim()) {
+
+    setError("");
+
+    if (!formData.title.trim() || !formData.url.trim() || !formData.category.trim()) {
       return;
     }
+
+    setSaving(true);
+
     let formattedUrl = formData.url;
     if (
-      !formData.url.startsWith('http://') && 
+      !formData.url.startsWith('http://') &&
       !formData.url.startsWith('https://')
     ) {
       formattedUrl = 'https://' + formData.url;
@@ -87,34 +125,47 @@ export default function App() {
       url: formattedUrl,
     };
 
-    const response = await fetch("/api/bookmarks", {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify(bookmarkToSave),
-    });
+    try {
 
-    const data = await response.json();
+      const response = await fetch("/api/bookmarks", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(bookmarkToSave),
+      });
 
-    const newBookmark: Bookmark = {
-      id: data.id,
-      title: data.title,
-      url: data.url,
-      tags: [data.category],
-      description: data.description,
-      createdAt: data.createdAt,
-      isArchived: data.isArchived,
-    };
+      const data = await response.json();
 
-    setBookmarks(prev => [...prev, newBookmark]);
-    setFormData({
-      title: "",
-      url: "",
-      description: "",
-      category: "",
-    });
-    setShowForm(false);
+      const newBookmark: Bookmark = {
+        id: data.id,
+        title: data.title,
+        url: data.url,
+        tags: [data.category],
+        description: data.description,
+        createdAt: data.createdAt,
+        isArchived: data.isArchived,
+      };
+
+      setBookmarks(prev => [...prev, newBookmark]);
+      setFormData({
+        title: "",
+        url: "",
+        description: "",
+        category: "",
+      });
+
+      setShowForm(false);
+    }
+
+    catch (error) {
+      console.log(error);
+      setError("Error: Failed to save bookmark....")
+    }
+
+    finally {
+      setSaving(false);
+    }
   }
 
   // Side Bar - category Search
@@ -156,14 +207,14 @@ export default function App() {
       </div>
       <main className="flex flex-col flex-1 border ">
 
-      {/* Add Bookmark Button and Search Bar */}
+        {/* Add Bookmark Button and Search Bar */}
 
         <div className="p-4 flex justify-between">
           <input type="text" placeholder="  Search by title..." className="border rounded-sm hover:scale-105 px-2 transition-transform" onChange={(e) => setSearchterm(e.target.value)} />
           <button className="bg-green-900 text-white w-35 h-8 rounded-md cursor-pointer hover:scale-110 transition-transform" onClick={() => setShowForm(!showForm)}>+ Add Bookmark</button>
         </div>
 
-      {/* Form Structure */}
+        {/* Form Structure */}
 
         {showForm && (
           <div className="m-2 flex flex-col justify-center items-center border gap-4 p-4">
@@ -220,11 +271,12 @@ export default function App() {
                 })} />
             </div>
 
-          {/* Save Button */}
+            {/* Save Button */}
 
             <button className="border rounded-2xl p-1.5 cursor-pointer hover:scale-110 transition-transform hover:bg-sky-100"
+              disabled={saving}
               onClick={handleSave}>
-              Save
+              {saving ? "Saving..." : "Save"}
             </button>
           </div>
         )}
@@ -232,27 +284,45 @@ export default function App() {
         {/* Card Structure */}
 
         <div className=" bg-sky-50">
+
           <h2 className="text-2xl font-bold m-4">All Bookmarks</h2>
-          <div className="grid grid-cols-3 gap-4 p-4">
-            {selectedCategory.includes("All") ? (
+
+          {error && (
+            <p className="text-red-500 border-2 rounded-2xl p-4 bg-red-200">{error}</p>
+          )}
+
+          {loading ? (
+            <div className="flex justify-center items-center flex-1 h-96">
+              <p className="font-semibold text-2xl border-4 rounded-4xl p-4 m-4">Loading your Bookmarks....</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-4 p-4">
+              {selectedCategory.includes("All") ? (
                 filteredBookmarks.map((bookmark) => (
                   <BookmarkCard
                     key={bookmark.id}
                     bookmark={bookmark}
                     onDelete={deleteCard}
+                    deleting={deleting}
                   />
                 ))
-            ) : (
-              categoryFilter.map((bookmark) => (
-                <BookmarkCard
+              ) : (
+                categoryFilter.map((bookmark) => (
+                  <BookmarkCard
                     key={bookmark.id}
                     bookmark={bookmark}
                     onDelete={deleteCard}
+                    deleting={deleting}
                   />
-              ))
-            )
-            }
-          </div>
+                ))
+              )
+              }
+            </div>
+          )
+
+          }
+
+
         </div>
       </main>
 

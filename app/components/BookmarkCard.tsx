@@ -3,9 +3,10 @@ import type { Bookmark } from "../type/bookmark";
 interface BookmarkCardProps {
     bookmark: Bookmark;
     onDelete: (id: number) => void;
+    deleting: boolean;
 }
 
-export default function BookmarkCard({ bookmark, onDelete }: BookmarkCardProps) {
+export default function BookmarkCard({ bookmark, onDelete, deleting }: BookmarkCardProps) {
     return (
         <div className="border rounded-md bg-slate-50 p-2">
             <div className="flex justify-between">
@@ -13,7 +14,7 @@ export default function BookmarkCard({ bookmark, onDelete }: BookmarkCardProps) 
                     <h3 className="text-xl">{bookmark.title}</h3>
                     <p className="text-gray-700 text-sm">{bookmark.url}</p>
                 </a>
-                <button onClick={() => onDelete(bookmark.id)} className="cursor-pointer">🗑️</button>
+                <button disabled={deleting} onClick={() => onDelete(bookmark.id)} className="cursor-pointer">🗑️</button>
             </div>
             <hr />
             <p>{bookmark.description}</p>
