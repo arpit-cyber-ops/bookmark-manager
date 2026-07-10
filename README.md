@@ -1,36 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bookmark Manager
 
-## Getting Started
+A full-stack bookmark management application built with Next.js, TypeScript, Prisma ORM, and PostgreSQL.
+Save, organize, search, and filter your bookmarks through a simple and clean interface.
 
-First, run the development server:
+I built this project while learning full-stack development with Next.js. The goal was to understand how React, APIs, databases, and deployment work together in a real application.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Live Demo
+
+**[https://bookmark-manager-chi-ten.vercel.app/](https://bookmark-manager-chi-ten.vercel.app/)**
+
+## 📸 Screenshot
+
+![Bookmark Manager](./public/screenshot.png)
+
+## ✨ Features
+
+- Create, read, and delete bookmarks
+- Search bookmarks by title in real-time
+- Filter bookmarks by multiple categories
+- Persistent storage with PostgreSQL
+- Form validation to prevent invalid submissions
+- Loading states and error handling
+- Clean UI with Tailwind CSS
+
+## 🛠️ Tech Stack
+
+**Frontend:**
+- Next.js 16 (App Router)
+- TypeScript
+- Tailwind CSS
+- React Hooks (useState, useEffect)
+
+**Backend:**
+- Next.js Route Handlers
+- Prisma ORM
+- PostgreSQL
+
+**Deployment:**
+- Development: Local PostgreSQL
+- Production: Vercel + Neon PostgreSQL
+
+## 🏗️ Architecture
+
+```text
+User
+   │
+React UI (TypeScript)
+   │
+fetch()
+   │
+Next.js Route Handlers
+   │
+Prisma ORM
+   │
+PostgreSQL Database
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📦 Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Clone the repository:
+```bash
+git clone https://github.com/arpit-cyber-ops/bookmark-manager.git
+cd bookmark-manager
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Install dependencies:
+```bash
+npm install
+```
 
-## Learn More
+3. Set up environment variables:
+   Create a `.env` file in the root directory:
+```env
+DATABASE_URL="postgresql://username:password@localhost:5432/bookmark_db"
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Run database migrations:
+```bash
+npx prisma migrate dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Start the development server:
+```bash
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+6. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Deploy on Vercel
+## 📖 Usage
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Add a Bookmark**: Click "+ Add Bookmark", fill in title, URL, description, and category, then click "Save"
+2. **Search**: Type in the search bar to filter by title
+3. **Filter by Category**: Use sidebar checkboxes to filter by one or more categories
+4. **Delete**: Click the trash icon to remove a bookmark
+5. **Visit Link**: Click a bookmark title to open the URL
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 💡 What I Learned
+
+- Managing state with React Hooks and lifting state up
+- Building REST APIs using Next.js Route Handlers
+- Using Prisma ORM with PostgreSQL
+- Fetching data with async/await and useEffect
+- Handling loading states and API errors
+- Deploying a full-stack application with Vercel
+- Understanding the request-response cycle between frontend and backend
+
+## ⚠️ Known Issues
+
+This project was built as part of my learning journey. There are a few known limitations:
+
+- Search and category filters currently work independently (not combined)
+- Duplicate bookmarks may appear when multiple selected categories match
+- The "All" checkbox synchronization needs improvement
+- No edit functionality yet
+- Mobile responsiveness could be improved
+
+These are documented as planned future improvements.
+
+## 🚀 Future Improvements
+
+- Combine search and category filtering
+- Fix duplicate bookmark rendering
+- Synchronize the "All" category checkbox
+- Add edit bookmark functionality
+- Complete archive feature
+- Add user authentication
+- Improve mobile responsiveness
+
+---
+
+**Note:** This project was built as part of my learning journey. While there are still improvements to be made, I chose to document them openly because documenting limitations is an important part of software development.
